@@ -9,6 +9,8 @@ Voilà comment vérifier et reproduire les résultats:
 
 Vous pouvez changer la variable PLOT à la ligne 20 pour voir ou ne pas voir des graphiques associés aux résultats. Ce qui est affiché sur la console correspond à :
 
+```
 (Nom du candidat) (Nb de sondages pré-25 fev. dans l'intervalle) (Nb de sondages pré-25 fev. hors intervalle) Nb de sondages post-25 fev. dans l'intervalle) (Nb de sondages post-25 fev. hors intervalle)
 Chi-square test des sondages pré-25 février 
 Chi-squre test des sondages post-25 février
+```
