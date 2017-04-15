@@ -17,22 +17,29 @@ RED_DATE = date(2017, 4, 23) - timedelta(60,0,0)
 
 CANDIDATES = ['Fillon', 'LePen', 'Melenchon', 'Macron']
 
-PLOT = True
+PLOT = False
 
 for CANDIDATE in CANDIDATES:
 	# Convertir les jours en nombre négatifs
-	plot_x = (sondages_df['DateFin2'].values.astype('datetime64'))
+	plot_x = (sondages_df['DayOfSurvey'].values.astype('datetime64'))
 	plot_x_numbers = (sondages_df['DaysBefore'].values.astype(int) * -1)
 	# Chiffres des sondages
 	values_candidate = sondages_df[CANDIDATE].values.astype(float)
 	# Moyenne
 	movingaverage_candidate = lowess(plot_x_numbers, values_candidate, f=0.3)
+	# Deviation from moyenne
+	dev_f_moyenne = abs(values_candidate - movingaverage_candidate)
+	# Moyenne of deviation from moyenne
+	dev_movingaverage = lowess(plot_x_numbers, dev_f_moyenne, f=0.8)
+
 
 	# Viz
 	if PLOT:
-		plt.plot(plot_x, values_candidate, 'k.')
-		plt.plot(plot_x, movingaverage_candidate, 'r')
-		plt.fill_between(plot_x, movingaverage_candidate + STD_ERROR, movingaverage_candidate - STD_ERROR)
+		# plt.plot(plot_x, values_candidate, 'k.')
+		# plt.plot(plot_x, movingaverage_candidate, 'r')
+		plt.plot(plot_x, dev_f_moyenne, 'b.')
+		plt.plot(plot_x, dev_movingaverage, 'g')
+		# plt.fill_between(plot_x, movingaverage_candidate + STD_ERROR, movingaverage_candidate - STD_ERROR)
 		
 		# Resultats historiques
 		with open('raw/resultats.csv') as resultats_file:
@@ -42,8 +49,8 @@ for CANDIDATE in CANDIDATES:
 					plt.plot(0, float(row['Result']), 'r.')
 		plt.show()
 
-	# Liste de (date, score dans les sondages, moyenne mouvante)
-	in_interval_list = list(zip(plot_x,values_candidate,movingaverage_candidate))
+	# Liste de (date, score dans les sondages, moyenne mouvante, date en chiffre)
+	in_interval_list = list(zip(plot_x,values_candidate,movingaverage_candidate, plot_x_numbers))
 	# Liste de ((Avant le 25 janvier ?), (Dans l'intervalle de la moyenne ?))
 	in_interval_list_true_false = list(map(
 			lambda args: (True if args[0] < RED_DATE else False, 
@@ -63,11 +70,15 @@ for CANDIDATE in CANDIDATES:
 
 	# Pour exporter
 	date_and_number = list(map(
-			lambda args: {'date':str(args[0]), 'number':float(args[1]), 'average':float(args[2])}, 
+			lambda args: {'date':int(args[3] + 160), 'number':float(args[1]), 'average':float(args[2])}, 
 			in_interval_list))
 	with open('data/'+CANDIDATE+'_graph.json', 'w') as outfile:
 		json.dump(date_and_number, outfile)
 
 	print(CANDIDATE, TotalBeforeIn, TotalBeforeOut, TotalAfterIn, TotalAfterOut)
-	print(chisquare([TotalBeforeIn,TotalBeforeOut],[42.84, 20.16]).pvalue)
-	print(chisquare([TotalAfterIn,TotalAfterOut],[72.08, 33.92]).pvalue)
+	predictedInBefore = (TotalBeforeIn + TotalBeforeOut) * .68
+	predictedOutBefore = (TotalBeforeIn + TotalBeforeOut) * .32
+	predictedInAfter = (TotalAfterIn + TotalAfterOut) * .68
+	predictedOutAfter = (TotalAfterIn + TotalAfterOut) * .32
+	print(chisquare([TotalBeforeIn,TotalBeforeOut],[predictedInBefore, predictedOutBefore]).pvalue)
+	print(chisquare([TotalAfterIn,TotalAfterOut],[predictedInAfter, predictedOutAfter]).pvalue)
