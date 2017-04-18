@@ -2,7 +2,7 @@ import csv, pandas, json
 import matplotlib.pyplot as plt
 import numpy as np
 from lowess import lowess
-from scipy.stats import chisquare
+from scipy.stats import chisquare, norm
 from datetime import datetime, timedelta, date
 
 # Importer
@@ -12,7 +12,12 @@ for sondage in sondages:
 	sondages_array.append(sondage)
 sondages_df = pandas.DataFrame(sondages_array)
 
-STD_ERROR = 1.35
+z_critical = norm.ppf(q = 1-(1-0.95)/2)
+def get_deviation(score, mediane):
+	return z_critical * np.sqrt((score*(100-score))/mediane)
+
+STD_ERROR = get_deviation(22, 1000)/2
+print('STD_ERROR = ' + str(STD_ERROR))
 RED_DATE = date(2017, 4, 23) - timedelta(60,0,0)
 
 CANDIDATES = ['Fillon', 'LePen', 'Melenchon', 'Macron']
@@ -55,7 +60,7 @@ for CANDIDATE in CANDIDATES:
 	in_interval_list_true_false = list(map(
 			lambda args: (True if args[0] < RED_DATE else False, 
 							True if abs(
-								args[1] - args[2]) < 1.35 else False), in_interval_list))
+								args[1] - args[2]) < STD_ERROR else False), in_interval_list))
 
 	TotalBeforeIn, TotalBeforeOut, TotalAfterIn, TotalAfterOut = 0, 0, 0, 0
 	for isBefore, isInInterval in in_interval_list_true_false:
