@@ -80,7 +80,11 @@ for CANDIDATE in CANDIDATES:
 	with open('data/'+CANDIDATE+'_graph.json', 'w') as outfile:
 		json.dump(date_and_number, outfile)
 
-	print(CANDIDATE, TotalBeforeIn, TotalBeforeOut, TotalAfterIn, TotalAfterOut)
+	print(CANDIDATE, 
+		TotalBeforeIn, TotalBeforeOut,
+		"({:.2})".format(TotalBeforeIn/(TotalBeforeIn + TotalBeforeOut)),
+		TotalAfterIn, TotalAfterOut,
+		"({:.2})".format(TotalAfterIn/(TotalAfterIn + TotalAfterOut)))
 	predictedInBefore = (TotalBeforeIn + TotalBeforeOut) * .68
 	predictedOutBefore = (TotalBeforeIn + TotalBeforeOut) * .32
 	predictedInAfter = (TotalAfterIn + TotalAfterOut) * .68
