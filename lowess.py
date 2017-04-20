@@ -26,6 +26,14 @@ def lowess(x, y, f=2. / 3., iter=3):
             b = np.array([np.sum(weights * y), np.sum(weights * y * x)])
             A = np.array([[np.sum(weights), np.sum(weights * x)],
                           [np.sum(weights * x), np.sum(weights * x * x)]])
+            if np.isnan(A).any():
+                print('changeda')
+                A = np.nan_to_num(A) 
+            elif np.isnan(b).any():
+                print('chamgedb')
+                b = np.nan_to_num(b)
+            if np.isinf(A).any() or np.isinf(b).any():
+                print('screwed')
             beta = linalg.solve(A, b)
             yest[i] = beta[0] + beta[1] * x[i]
 

@@ -16,7 +16,7 @@ z_critical = norm.ppf(q = 1-(1-0.95)/2)
 def get_deviation(score, mediane):
 	return z_critical * np.sqrt((score*(100-score))/mediane)
 
-STD_ERROR = get_deviation(22, 1000)/2
+STD_ERROR = get_deviation(21, 1000)/2
 print('STD_ERROR = ' + str(STD_ERROR))
 RED_DATE = date(2017, 4, 23) - timedelta(60,0,0)
 

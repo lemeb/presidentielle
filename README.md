@@ -14,3 +14,4 @@ Vous pouvez changer la variable PLOT à la ligne 20 pour voir ou ne pas voir des
 Chi-square test des sondages pré-25 février 
 Chi-squre test des sondages post-25 février
 ```
+
